@@ -201,8 +201,7 @@ jobs:
             cc: mips64el-linux-gnuabi64-gcc
           - goos: linux
             goarch: mipsle
-            cgo_enabled: 1
-            cc: mipsel-linux-gnu-gcc
+            cgo_enabled: 0
           - goos: linux
             goarch: mips
             cgo_enabled: 1
@@ -216,6 +215,7 @@ jobs:
       GOAMD64: ${{ matrix.goamd64 }}
       CGO_ENABLED: ${{ matrix.cgo_enabled || 0 }}
       CC: ${{ matrix.cc }}
+      GOMIPS: softfloat
 
     steps:
       - uses: actions/checkout@v6
@@ -266,7 +266,7 @@ jobs:
         run: |
           mkdir -p ./bundled/
           export VERSION=${{ steps.get_version.outputs.VERSION }}
-          export GOFLAGS="-trimpath -modcacherw"
+          export GOFLAGS="-trimpath -modcacherw -ldflags '-s -w -static'"  # ✅ 强制静态链接
           export OUTPUT=bundled/${{ steps.get_filename.outputs.BUNDLE_NAME }}
           make
           cp ./install/daed.service ./bundled/
